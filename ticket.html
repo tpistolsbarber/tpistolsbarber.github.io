@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket de Compra Interactivo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 400px;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    #logo {
+      display: block;
+      margin: 0 auto 10px;
+      max-width: 120px;
+    }
+    table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 5px;
+      text-align: left;
+    }
+    .total {
+      font-weight: bold;
+    }
+    button, select, input {
+      padding: 5px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #mensaje-final {
+      margin-top: 20px;
+      text-align: center;
+      font-style: italic;
+      display: none;
+    }
+    @media print {
+      button, select, input {
+        display: none;
+      }
+      #mensaje-final {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo de la tienda -->
+  <img src="logo.jpg" alt="Logo The Pistols Barber" id="logo">
+   
+  <div id="fecha-hora" style="text-align: center; font-size: 14px; margin-bottom: 10px;"></div>
+
+  <h2>Ticket de Compra</h2>
+
+  <label for="producto">Selecciona un producto:</label>
+  <select id="producto">
+    <option disabled selected>-- Elige un producto --</option>
+    <optgroup label="Máquinas">
+      <option value="Máquina de cortar cabello profesional Wahl Senior Cordless">Máquina Wahl Senior Cordless - $3000</option>
+      <option value="Máquina de cortar cabello Oster Classic 76">Máquina Oster Classic 76 - $2300</option>
+      <option value="Trimmer de barba y cabello Wahl Detailer">Trimmer Wahl Detailer - $1000</option>
+      <option value="Trimmer de contornos BabylissPRO FX787SKE Skeleton">Trimmer BabylissPRO Skeleton - $1800</option>
+    </optgroup>
+    <optgroup label="Pomadas">
+      <option value="Pomada para cabello Suavecito Original Hold">Suavecito Original Hold - $300</option>
+      <option value="Pomada para cabello Layrite Super Hold">Layrite Super Hold - $380</option>
+      <option value="Pomada mate American Crew Fiber">American Crew Fiber - $420</option>
+      <option value="Cera modeladora Reuzel Clay Matte Pomade">Reuzel Clay Matte - $450</option>
+    </optgroup>
+    <optgroup label="Insumos">
+      <option value="Alcohol isopropílico (1 litro)">Alcohol isopropílico (1L) - $120</option>
+      <option value="Peróxido de hidrógeno (1 litro)">Peróxido de hidrógeno (1L) - $70</option>
+      <option value="Talco para después del corte">Talco - $50</option>
+      <option value="Papel para cuello desechable (rollo)">Papel cuello - $150</option>
+      <option value="Brochas para afeitar (cerda natural o sintética)">Brochas para afeitar - $300</option>
+      <option value="Jabón para afeitar (barra o crema)">Jabón para afeitar - $200</option>
+    </optgroup>
+      <optgroup label="Tijeras">
+      <option value="Tijera de corte profesional Jaguar Pre Style Ergo">Tijera Jaguar Ergo - $1200</option>
+      <option value="Tijera de entresacar Jaguar JP 38">Tijera entresacar JP 38 - $1300</option>
+      <option value="Set de tijeras básicas para principiantes">Set tijeras básicos - $750</option>
+    </optgroup>
+    <optgroup label="Portanavajas">
+      <option value="Portanavaja de barbero clásico (acero inoxidable)">Portanavaja clásico - $500</option>
+      <option value="Hojas de repuesto para navaja de barbero (paquete)">Hojas repuesto - $150</option>
+    </optgroup>
+    <optgroup label="Aumento para máquinas">
+      <option value="Set de peines guía universales (8 piezas)">Set peines guía (8) - $300</option>
+      <option value="Peines guía individuales">Peines guía individual - $70</option>
+    </optgroup>
+  </select>
+
+  <label for="cantidad">Cantidad:</label>
+  <input type="number" id="cantidad" min="1" value="1">
+
+  <button onclick="agregarProducto()">Agregar al ticket</button>
+
+  <table id="ticket">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cant.</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <table>
+    <tr>
+      <td>Subtotal:</td>
+      <td id="subtotal">0.00 $</td>
+    </tr>
+    <tr>
+      <td>IVA (16%):</td>
+      <td id="iva">0.00 $</td>
+    </tr>
+    <tr class="total">
+      <td>Total:</td>
+      <td id="total">0.00 $</td>
+    </tr>
+  </table>
+
+  <button onclick="window.print()">Imprimir Ticket</button>
+
+  <div id="mensaje-final">Gracias por tu compra en The Pistols Barber</div>
+
+  <script>
+    // Mostrar fecha y hora actual
+function mostrarFechaHora() {
+  const ahora = new Date();
+  const opciones = {
+    weekday: 'long', year: 'numeric', month: 'long',
+    day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+  };
+  const fechaHoraFormateada = ahora.toLocaleDateString('es-MX', opciones);
+  document.getElementById("fecha-hora").textContent = fechaHoraFormateada;
+}
+
+mostrarFechaHora();
+    const precios = {
+      "Máquina de cortar cabello profesional Wahl Senior Cordless": 3000,
+      "Máquina de cortar cabello Oster Classic 76": 2300,
+      "Trimmer de barba y cabello Wahl Detailer": 1000,
+      "Trimmer de contornos BabylissPRO FX787SKE Skeleton": 1800,
+      "Pomada para cabello Suavecito Original Hold": 300,
+      "Pomada para cabello Layrite Super Hold": 380,
+      "Pomada mate American Crew Fiber": 420,
+      "Cera modeladora Reuzel Clay Matte Pomade": 450,
+      "Alcohol isopropílico (1 litro)": 120,
+      "Peróxido de hidrógeno (1 litro)": 70,
+      "Talco para después del corte": 50,
+      "Papel para cuello desechable (rollo)": 150,
+      "Brochas para afeitar (cerda natural o sintética)": 300,
+      "Jabón para afeitar (barra o crema)": 200,
+      "Tijera de corte profesional Jaguar Pre Style Ergo": 1200,
+      "Tijera de entresacar Jaguar JP 38": 1300,
+      "Set de tijeras básicas para principiantes": 750,
+      "Portanavaja de barbero clásico (acero inoxidable)": 500,
+      "Hojas de repuesto para navaja de barbero (paquete)": 150,
+      "Set de peines guía universales (8 piezas)": 300,
+      "Peines guía individuales": 70,
+     };
+
+    function agregarProducto() {
+      const select = document.getElementById("producto");
+      const producto = select.value;
+      const cantidad = parseInt(document.getElementById("cantidad").value);
+
+      if (!producto || cantidad < 1) return;
+
+      const precio = precios[producto];
+      const tbody = document.querySelector("#ticket tbody");
+      const fila = document.createElement("tr");
+      fila.innerHTML = `<td>${producto}</td><td>${cantidad}</td><td>${(precio * cantidad).toFixed(2)}</td>`;
+      tbody.appendChild(fila);
+
+      actualizarTotales();
+    }
+
+    function actualizarTotales() {
+      const filas = document.querySelectorAll("#ticket tbody tr");
+      let subtotal = 0;
+
+      filas.forEach(fila => {
+        const precioTotal = parseFloat(fila.cells[2].textContent);
+        subtotal += precioTotal;
+      });
+
+      const iva = subtotal * 0.16;
+      const total = subtotal + iva;
+
+      document.getElementById("subtotal").textContent = subtotal.toFixed(2) + " $";
+      document.getElementById("iva").textContent = iva.toFixed(2) + " $";
+      document.getElementById("total").textContent = total.toFixed(2) + " $";
+    }
+  </script>
+
+</body>
+</html>
